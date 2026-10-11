@@ -1,22 +1,47 @@
 # Task Manager Backend
 
-ASP.NET Core 8 API, EF Core, PostgreSQL and JWT login. Registration endpoint is intentionally absent; startup creates the demo user if it does not exist.
+ASP.NET Core Web API для приложения Task Manager. Backend обрабатывает запросы клиента, выполняет авторизацию с помощью JWT и хранит данные пользователей и задач в PostgreSQL.
 
-Demo credentials: `demo` / `demo123`.
+**[Демо](https://vitaliyarmss.github.io/task-manager-frontend/)** · **[Frontend](https://github.com/VitaliyArmss/task-manager-frontend)** · **[Главный репозиторий](https://github.com/VitaliyArmss/task-manager-project)**
 
-## Local run
+## Технологии
 
-This project reads configuration from ASP.NET Core configuration providers. The `.env.production` file is **not automatically read by `dotnet run`**; it is intended to be installed as `/etc/taskmanager.env` on the Linux VPS and loaded by `systemd`. For local development use .NET User Secrets or temporary PowerShell environment variables.
+- C# и ASP.NET Core Web API
+- JWT-аутентификация
+- PostgreSQL
 
-```powershell
+## Основные задачи backend
+
+- обработка запросов frontend;
+- авторизация пользователя и выдача токена;
+- работа с данными пользователей и задач;
+- взаимодействие с PostgreSQL.
+
+## Локальный запуск
+
+Требуются .NET SDK и доступный экземпляр PostgreSQL.
+
+```bash
 dotnet restore
 dotnet run
 ```
 
-## Secrets
+Команды нужно выполнять в папке с `.csproj`. Если проект находится во вложенной папке, укажи путь к файлу проекта явно.
 
-- `.env.production` contains the production PostgreSQL password and JWT signing key. Never upload it to GitHub.
-- `.gitignore` ignores `.env.*`; `.env.example` contains placeholders only.
-- The production database role expected by the file is `taskmanager`, with database `taskmanager`.
+Перед запуском настрой строку подключения к PostgreSQL и параметры JWT через локальную конфигурацию или переменные окружения.
 
-See `DEPLOY_VPS.md` for the full Windows-to-VPS and database backup/restore process.
+## Конфигурация
+
+В production используются параметры подключения к базе данных и JWT, задаваемые через переменные окружения. Не коммить пароли, JWT secret и другие секреты в репозиторий. Production-конфигурация должна храниться отдельно от исходного кода.
+
+## Production
+
+Backend развёрнут на VPS. Nginx принимает HTTPS-запросы по префиксу `/task-manager/` и проксирует их в ASP.NET Core API на внутреннем порту `5001`.
+
+Базовый адрес API:
+
+```text
+https://api.vitaliy-armss.ru/task-manager/api
+```
+
+Для frontend необходимо настроить CORS для соответствующего origin, например `https://vitaliyarmss.github.io`, а для локальной разработки — `http://localhost:5173`.
